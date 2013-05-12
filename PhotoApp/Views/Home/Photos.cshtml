@@ -1,0 +1,31 @@
+﻿@{
+    ViewBag.Title = "Welcome to Photo Access!";
+}
+@model PhotoApp.Models.PhotosModel
+<p>
+    Hello, @Model.Owner.FullName, thanks for logging in!
+    Here are the photos that are publicly available in your photostream.
+</p>
+    <p>
+    Options:
+    <br />See @Html.ActionLink("all", "Photos", "Home") photos.
+    <br />See photos by tag: @foreach (var tag in Model.Tags) { <a href="Photos?q=@tag">@tag</a>@(tag == Model.Tags.Last() ? String.Empty : ", ") }
+</p>
+
+<table>
+    @foreach (var group in Model.PaginatePhotosbySize(8)) {
+    <tr>
+        @foreach (var photo in group)
+        {
+        <td style="vertical-align:top">
+            <b>@photo.Name</b>
+            <br />
+            <a href="@photo.LargeUrl"><img src="@photo.ThumbNailUrl" /></a>
+            <br />
+            <b>Tags:</b> <br />@foreach (var tag in photo.Tags) { <a href="Photos?q=@tag">@tag</a>@(tag == photo.Tags.Last() ? String.Empty : ", ")<br /> }
+        </td>
+        }
+    </tr>
+    }
+</table>
+
