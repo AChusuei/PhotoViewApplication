@@ -131,6 +131,7 @@ namespace PhotoApp.PhotoServices
 
         public string GetOAuthAuthenticationUrl(string callbackUrl)
         {
+            // If we are getting a new OAuthRequestToken, the old access tokens need to be removed
             OAuthAccessToken = null;
             OAuthAccessTokenSecret = null;
             var requestToken = OAuthGetRequestToken(callbackUrl);
@@ -140,8 +141,7 @@ namespace PhotoApp.PhotoServices
 
         public OAuthAccessToken SetOAuthAccessToken(string requestToken, string verifier)
         {
-            var accessToken = OAuthGetAccessToken(_requestTokens[requestToken], verifier);
-            return accessToken;
+            return OAuthGetAccessToken(_requestTokens[requestToken], verifier);
         }
 
         public bool IsOAuthAuthenticated

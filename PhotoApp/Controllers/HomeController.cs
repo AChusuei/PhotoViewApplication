@@ -37,7 +37,6 @@ namespace PhotoApp.Controllers
             }
             else
             {
-                ViewBag.Message = "So you'd like to see your photos, right? You'll need to login first at the url below.";
                 return View();
             }
         }
