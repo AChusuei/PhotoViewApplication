@@ -1,4 +1,5 @@
-﻿@if(Session["RequestToken"] != null) {
+﻿@if (Session["OAuthUser"] != null)
+{
     <text>Welcome!
     [ @Html.ActionLink("Log Off", "LogOut", "Home") ]</text>
 }

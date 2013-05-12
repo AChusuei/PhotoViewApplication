@@ -13,6 +13,8 @@ namespace PhotoApp.Controllers
 {
     public class HomeController : Controller
     {
+        private const string OAuthSessionKey = @"OAuthUser";
+
         private string BaseUrl
         {
             get
@@ -40,7 +42,7 @@ namespace PhotoApp.Controllers
         [HttpGet]
         public ActionResult Index()
         {
-            if (Session["RequestToken"] != null)
+            if (Session[OAuthSessionKey] != null)
             {
                 return Redirect(BaseUrl + String.Format(@"/Photos?oauth_token={0}", Session["RequestToken"]));
             }
@@ -53,17 +55,11 @@ namespace PhotoApp.Controllers
         [HttpGet]
         public ActionResult Photos(string oauth_token, string oauth_verifier, string q)
         {
-            var token = oauth_token;
-            if (String.IsNullOrWhiteSpace(token))
+            if (Session[OAuthSessionKey] == null)
             {
-                token = Session["RequestToken"] as string;
+                Session[OAuthSessionKey] = OAuthService.GetOAuthUser(oauth_token, oauth_verifier);
             }
-            var user = PhotoService.GetUser(token);
-            if (user == null)
-            {
-                user = OAuthService.GetOAuthUser(oauth_token, oauth_verifier);
-                Session["RequestToken"] = oauth_token;
-            }
+            var user = Session[OAuthSessionKey] as OAuthUser;
             var photos = PhotoService.GetPhotos(user, (q ?? String.Empty ));
             var alltags = PhotoService.GetAllTags(user);
             var photosmodel = new PhotosModel { Owner = user, Photos = photos, Tags = alltags };
@@ -79,7 +75,7 @@ namespace PhotoApp.Controllers
         [HttpGet]
         public ActionResult LogOut()
         {
-            Session["RequestToken"] = null;
+            Session[OAuthSessionKey] = null;
             return Redirect(BaseUrl);
         }
 

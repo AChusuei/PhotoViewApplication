@@ -29,7 +29,6 @@ namespace PhotoApp.PhotoServices
 
     public interface IPhotoService
     {
-        IOAuthUser GetUser(string userKey);
         IEnumerable<IPhoto> GetPhotos(IOAuthUser owner, string tags);
         IEnumerable<string> GetAllTags(IOAuthUser owner);
     }
@@ -45,14 +44,11 @@ namespace PhotoApp.PhotoServices
 
         IOAuthUser IOAuthService.GetOAuthUser(string requestToken, string verifier)
         {
+            var user = (_users.ContainsKey(requestToken) ? _users[requestToken] : null);
+            if (user != null) return user;
             var accessToken = FlickrAPI.Instance.GetOAuthAccessToken(requestToken, verifier);
             _users[requestToken] = new OAuthUser { Id = accessToken.UserId, FullName = accessToken.FullName, UserName = accessToken.Username };
             return _users[requestToken];
-        }
-
-        IOAuthUser IPhotoService.GetUser(string requestToken)
-        {
-            return (_users.ContainsKey(requestToken) ? _users[requestToken] : null);
         }
 
         IEnumerable<IPhoto> IPhotoService.GetPhotos(IOAuthUser owner, string tag)
