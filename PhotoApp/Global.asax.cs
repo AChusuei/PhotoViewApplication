@@ -8,6 +8,7 @@ using System.Web.Mvc;
 using System.Web.Routing;
 using StructureMap;
 using PhotoApp.PhotoServices;
+using PhotoApp.OAuthServices;
 
 namespace PhotoApp
 {
@@ -22,7 +23,8 @@ namespace PhotoApp
         {
             ObjectFactory.Initialize(x =>
             {
-                x.For<IOAuthPhotoService>().Use<FlickrPhotoService>();
+                x.For<IPhotoService>().Use<FlickrService>();
+                x.For<IOAuthService>().Use<FlickrService>();
             });
         }
 

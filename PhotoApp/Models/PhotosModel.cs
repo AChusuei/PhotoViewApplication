@@ -3,12 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using PhotoApp.PhotoServices;
+using PhotoApp.OAuthServices;
 
 namespace PhotoApp.Models
 {
     public class PhotosModel
     {
-        public IPhotoUser Owner { get; set; }
+        public IOAuthUser Owner { get; set; }
         public IEnumerable<IPhoto> Photos { get; set; }
         public IEnumerable<string> Tags { get; set; }
 

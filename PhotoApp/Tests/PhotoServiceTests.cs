@@ -9,7 +9,7 @@ namespace PhotoApp.Tests
 {
     public class PhotoServiceTests
     {
-        IOAuthPhotoService _photoService;
+        IPhotoService _photoService;
 
         [SetUp]
         public void SetUp()

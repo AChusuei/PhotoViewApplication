@@ -5,6 +5,7 @@ using System.Web;
 using System.Web.Mvc;
 using StructureMap;
 using PhotoApp.PhotoServices;
+using PhotoApp.OAuthServices;
 using PhotoApp.Models;
 using FlickrNet;
 
@@ -20,11 +21,19 @@ namespace PhotoApp.Controllers
             }
         }
 
-        private IOAuthPhotoService PhotoService
+        private IPhotoService PhotoService
         {
             get 
             {
-                return ObjectFactory.GetInstance<IOAuthPhotoService>();
+                return ObjectFactory.GetInstance<IPhotoService>();
+            }
+        }
+
+        private IOAuthService OAuthService
+        {
+            get
+            {
+                return ObjectFactory.GetInstance<IOAuthService>();
             }
         }
 
@@ -52,7 +61,7 @@ namespace PhotoApp.Controllers
             var user = PhotoService.GetUser(token);
             if (user == null)
             {
-                user = PhotoService.CreateOAuthAccessTokens(oauth_token, oauth_verifier);
+                user = OAuthService.GetOAuthUser(oauth_token, oauth_verifier);
                 Session["RequestToken"] = oauth_token;
             }
             var photos = PhotoService.GetPhotos(user, (q ?? String.Empty ));
@@ -64,7 +73,7 @@ namespace PhotoApp.Controllers
         [HttpGet]
         public ActionResult LogOn()
         {
-            return Redirect(PhotoService.GetOAuthAuthenticationUrl(BaseUrl + "/Photos"));
+            return Redirect(OAuthService.GetOAuthAuthenticationUrl(BaseUrl + "/Photos"));
         }
 
         [HttpGet]
