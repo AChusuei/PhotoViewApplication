@@ -44,7 +44,7 @@ namespace PhotoApp.PhotoServices
                 photos = photos.Where(p => p.Tags.Any(t => t == tag)).ToList();
             }
 
-            return photos.Select(p => new Photo { Id = p.PhotoId, Name = p.Title, ThumbNailUrl = p.ThumbnailUrl, LargeUrl = p.LargeUrl, Owner = owner, Tags = p.Tags });
+            return photos.Select(p => new Photo { Id = p.PhotoId, Name = p.Title, ThumbNailUrl = p.ThumbnailUrl, SmallUrl = p.SmallUrl, LargeUrl = p.LargeUrl, Owner = owner, Tags = p.Tags });
         }
 
         IEnumerable<string> IPhotoService.GetAllTags(IOAuthUser owner)

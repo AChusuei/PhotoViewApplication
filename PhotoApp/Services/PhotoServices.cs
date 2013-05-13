@@ -11,6 +11,7 @@ namespace PhotoApp.PhotoServices
         string Id { get; set; }
         string Name { get; set; }
         string LargeUrl { get; set; }
+        string SmallUrl { get; set; }
         string ThumbNailUrl { get; set; }
         IOAuthUser Owner { get; set; }
         IEnumerable<string> Tags { get; set; }
@@ -21,6 +22,7 @@ namespace PhotoApp.PhotoServices
         public string Id { get; set; }
         public string Name { get; set; }
         public string LargeUrl { get; set; }
+        public string SmallUrl { get; set; }
         public string ThumbNailUrl { get; set; }
         public IOAuthUser Owner { get; set; }
         public IEnumerable<string> Tags { get; set; }
