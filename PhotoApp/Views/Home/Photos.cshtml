@@ -12,12 +12,12 @@
     <br />See photos by tag: @foreach (var tag in Model.Tags) { <a href="Photos?q=@tag">@tag</a>@(tag == Model.Tags.Last() ? String.Empty : ", ") }
 </p>
 
-<table>
-    @foreach (var group in Model.PaginatePhotosbySize(8)) {
+<table style="border-style:none">
+    @foreach (var group in Model.PaginatePhotosbySize(10)) {
     <tr>
         @foreach (var photo in group)
         {
-        <td style="vertical-align:top">
+        <td style="vertical-align:top; border-style:none">
             <b>@photo.Name</b>
             <br />
             <a href="@photo.LargeUrl"><img src="@photo.ThumbNailUrl" /></a>
