@@ -35,15 +35,18 @@
             <div style="display:none" id="@String.Concat(photo.Id, "HOVER")"><a href="@photo.LargeUrl"><img src="@photo.SmallUrl" /></a></div>
             <script>
                 $('#@String.Concat(photo.Id, "IMG")')
-                    .mouseenter(function () {
+                    .hover(function () {
                         timer = setTimeout(function () { 
                             $('#@String.Concat(photo.Id, "HOVER")').css('position', 'absolute');
                             $('#@String.Concat(photo.Id, "HOVER")').css('left', currentMousePos.x);
                             $('#@String.Concat(photo.Id, "HOVER")').css('top', currentMousePos.y);
                             $('#@String.Concat(photo.Id, "HOVER")').show();
                         }, 1500);
-                    })
-                    .mouseleave(function () { clearTimeout(timer); $('#@String.Concat(photo.Id, "HOVER")').hide(); });
+                    },
+                    function () {
+                        $('#@String.Concat(photo.Id, "HOVER")').hide();
+                        clearTimeout(timer);
+                    });
             </script>
             <b>Tags:</b> <br />@foreach (var tag in photo.Tags) { <a href="Photos?q=@tag">@tag</a>@(tag == photo.Tags.Last() ? String.Empty : ", ")<br /> }
         </td>
