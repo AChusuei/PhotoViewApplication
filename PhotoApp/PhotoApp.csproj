@@ -120,10 +120,11 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Models\PhotosModel.cs" />
+    <Compile Include="Services\FlickrAPI.cs" />
     <Compile Include="Services\PhotoServices.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\OAuthServices.cs" />
-    <Compile Include="Tests\FlickrAPITests.cs" />
+    <Compile Include="Tests\FlickrAPIIntegrationTests.cs" />
     <Compile Include="Tests\HomeControllerTests.cs" />
   </ItemGroup>
   <ItemGroup>
