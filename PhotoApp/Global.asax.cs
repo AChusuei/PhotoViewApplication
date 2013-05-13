@@ -23,8 +23,8 @@ namespace PhotoApp
         {
             ObjectFactory.Initialize(x =>
             {
-                x.For<IPhotoService>().Use<FlickrService>();
-                x.For<IOAuthService>().Use<FlickrService>();
+                x.For<IPhotoService>().Singleton().Use<FlickrAPI>();
+                x.Forward<IPhotoService, IOAuthService>();
             });
         }
 

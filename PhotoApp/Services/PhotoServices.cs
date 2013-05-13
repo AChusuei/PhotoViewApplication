@@ -33,71 +33,17 @@ namespace PhotoApp.PhotoServices
         IEnumerable<string> GetAllTags(IOAuthUser owner);
     }
 
-    public class FlickrService : IPhotoService, IOAuthService
-    {
-        private static IDictionary<string, IOAuthUser> _users = new Dictionary<string, IOAuthUser>();
-
-        string IOAuthService.GetOAuthAuthenticationUrl(string callbackUrl)
-        {
-            return FlickrAPI.Instance.GetOAuthAuthenticationUrl(callbackUrl);
-        }
-
-        IOAuthUser IOAuthService.GetOAuthUser(string requestToken, string verifier)
-        {
-            var user = (_users.ContainsKey(requestToken) ? _users[requestToken] : null);
-            if (user != null) return user;
-            var accessToken = FlickrAPI.Instance.GetOAuthAccessToken(requestToken, verifier);
-            _users[requestToken] = new OAuthUser { Id = accessToken.UserId, FullName = accessToken.FullName, UserName = accessToken.Username };
-            return _users[requestToken];
-        }
-
-        IEnumerable<IPhoto> IPhotoService.GetPhotos(IOAuthUser owner, string tag)
-        {
-            var photos = FlickrAPI.Instance.PeopleGetPhotos(owner.Id, PhotoSearchExtras.Tags).ToList();
-            if (!String.IsNullOrWhiteSpace(tag))
-            {
-                photos = photos.Where(p => p.Tags.Any(t => t == tag)).ToList();
-            }
-            
-            return photos.Select(p => new Photo { Id = p.PhotoId, Name = p.Title, ThumbNailUrl = p.ThumbnailUrl, LargeUrl = p.LargeUrl, Owner = owner, Tags = p.Tags });
-        }
-
-        IEnumerable<string> IPhotoService.GetAllTags(IOAuthUser owner)
-        {
-            return FlickrAPI.Instance.PeopleGetPhotos(owner.Id, PhotoSearchExtras.Tags).SelectMany(p => p.Tags).Where(t => !String.IsNullOrWhiteSpace(t)).Distinct();
-        }
-    }
-
-    public class FlickrAPI : Flickr
+    public class FlickrAPI : Flickr, IOAuthService, IPhotoService
     {
         private const string _apiKey = "ede024e9afd0c16b296568a532687dfa";
         private const string _secretKey = "a5b0ec729fafef41";
 
-        private static volatile FlickrAPI _instance;
-        private static Object lockobject = new Object();
         private static IDictionary<string, OAuthRequestToken> _requestTokens = new Dictionary<string, OAuthRequestToken>();
+        private static IDictionary<string, IOAuthUser> _users = new Dictionary<string, IOAuthUser>();
 
-        private FlickrAPI() : base(_apiKey, _secretKey) { }
+        public FlickrAPI() : base(_apiKey, _secretKey) { }
 
-        public static FlickrAPI Instance
-        {
-            get 
-            {
-                if (_instance == null)
-                {
-                    lock (lockobject)
-                    {
-                        if (_instance == null)
-                        { 
-                            _instance = new FlickrAPI();
-                        }
-                    }
-                }
-                return _instance;
-            }
-        }
-
-        public string GetOAuthAuthenticationUrl(string callbackUrl)
+        string IOAuthService.GetOAuthAuthenticationUrl(string callbackUrl)
         {
             // If we are getting a new OAuthRequestToken, the old access tokens need to be removed
             OAuthAccessToken = null;
@@ -107,9 +53,29 @@ namespace PhotoApp.PhotoServices
             return OAuthCalculateAuthorizationUrl(requestToken.Token, AuthLevel.Read);
         }
 
-        public OAuthAccessToken GetOAuthAccessToken(string requestToken, string verifier)
+        IOAuthUser IOAuthService.GetOAuthUser(string requestToken, string verifier)
         {
-            return OAuthGetAccessToken(_requestTokens[requestToken], verifier);
+            var user = (_users.ContainsKey(requestToken) ? _users[requestToken] : null);
+            if (user != null) return user;
+            var accessToken = OAuthGetAccessToken(_requestTokens[requestToken], verifier);
+            _users[requestToken] = new OAuthUser { Id = accessToken.UserId, FullName = accessToken.FullName, UserName = accessToken.Username };
+            return _users[requestToken];
+        }
+
+        IEnumerable<IPhoto> IPhotoService.GetPhotos(IOAuthUser owner, string tag)
+        {
+            var photos = PeopleGetPhotos(owner.Id, PhotoSearchExtras.Tags).ToList();
+            if (!String.IsNullOrWhiteSpace(tag))
+            {
+                photos = photos.Where(p => p.Tags.Any(t => t == tag)).ToList();
+            }
+
+            return photos.Select(p => new Photo { Id = p.PhotoId, Name = p.Title, ThumbNailUrl = p.ThumbnailUrl, LargeUrl = p.LargeUrl, Owner = owner, Tags = p.Tags });
+        }
+
+        IEnumerable<string> IPhotoService.GetAllTags(IOAuthUser owner)
+        {
+            return PeopleGetPhotos(owner.Id, PhotoSearchExtras.Tags).SelectMany(p => p.Tags).Where(t => !String.IsNullOrWhiteSpace(t)).Distinct();
         }
     }
 }

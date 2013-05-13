@@ -24,6 +24,4 @@ namespace PhotoApp.Models
                 yield return listToSplit.Skip(maxBucketSize * i).Take(maxBucketSize);
         }
     }
-
-    
 }

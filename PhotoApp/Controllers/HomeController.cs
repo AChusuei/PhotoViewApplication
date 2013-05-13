@@ -13,13 +13,14 @@ namespace PhotoApp.Controllers
 {
     public class HomeController : Controller
     {
-        private const string OAuthSessionKey = @"OAuthUser";
+        public const string OAuthSessionKey = @"OAuthUser";
 
         private string BaseUrl
         {
             get
             {
-                return Request.Url.GetLeftPart(UriPartial.Authority);
+                // this is not great, but for unit testing purposes need the null check.
+                return (Request.Url == null ? @"http://localhost:8000" : Request.Url.GetLeftPart(UriPartial.Authority));
             }
         }
 
@@ -44,7 +45,7 @@ namespace PhotoApp.Controllers
         {
             if (Session[OAuthSessionKey] != null)
             {
-                return Redirect(BaseUrl + String.Format(@"/Photos?oauth_token={0}", Session["RequestToken"]));
+                return Redirect(BaseUrl + @"/Photos");
             }
             else
             {
@@ -59,8 +60,8 @@ namespace PhotoApp.Controllers
             {
                 Session[OAuthSessionKey] = OAuthService.GetOAuthUser(oauth_token, oauth_verifier);
             }
-            var user = Session[OAuthSessionKey] as OAuthUser;
-            var photos = PhotoService.GetPhotos(user, (q ?? String.Empty ));
+            var user = Session[OAuthSessionKey] as IOAuthUser;
+            var photos = PhotoService.GetPhotos(user, (q ?? String.Empty));
             var alltags = PhotoService.GetAllTags(user);
             var photosmodel = new PhotosModel { Owner = user, Photos = photos, Tags = alltags };
             return View(photosmodel);
@@ -77,11 +78,6 @@ namespace PhotoApp.Controllers
         {
             Session[OAuthSessionKey] = null;
             return Redirect(BaseUrl);
-        }
-
-        public ActionResult About()
-        {
-            return View();
         }
     }
 }
